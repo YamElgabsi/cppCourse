@@ -1,47 +1,39 @@
-#include <iostream>
 #include "Board.h"
 
-int main(int argc, char *argv[])
-{
-    int referees, players;
-    if(argc != 3){
-        cerr<<"ERROR: USAGE <executable> NUM_REFEREES MAX_ATHLETES"<<endl;
-        return 1;
-    }
-    stringstream data1(argv[1]);
-    stringstream data2(argv[2]);
-    data1 >> referees;
-    data2 >> players;
 
-
-    //start game!
-    string choice;
-    Board board(players,referees);
+int main() {
+    string input;
+    int player, turn = 1, row, col;
+    bool  quit = false;
+    Board *board = new Board;
     while (true){
-        //cout<<"Enter Your Choice"<< endl;
-        getline(cin, choice);
-        if (choice == "0")
+        board->print();
+        selects_turn(turn,player);
+        while (!get_valid_input(input,quit)); //get input until pass valid tests
+        if (quit){
+            if (player == BLUE){
+                cout << "B: QUIT" << endl;
+                board->print();
+                cout << "R wins the game." << endl;
+            }
+            else{
+                cout << "R: QUIT" << endl;
+                board->print();
+                cout << "B wins the game." << endl;
+                break;
+            }
+        }
+        update_by_input(input,row,col);
+        if (board->makeMove(player,row-1,col-1))
+            turn++;
+        if (board->isWon(player)){
+            if (player == BLUE){
+                cout << "B wins the game." << endl;
+                break;
+            }
+            cout << "R wins the game." << endl;
             break;
-        if (choice == "1")
-            board.setPlayer();
-        if( choice == "2")
-            board.printPlayerGrades();
-
-        if( choice == "3")
-            board.printPlayerMean();
-
-        if( choice == "4")
-            board.printScoreSummary();
-
-        if (choice == "5")
-            board.printMeanVector();
-
-        if (choice == "6")
-            board.printCovarianceMatrix();
-
-        if (choice != "0" && choice != "1" && choice != "2" && choice != "3" && choice != "4" && choice != "5" && choice != "6")
-            cerr<<"ERROR: invalid command; type 0 for exit"<<endl;
+        }
     }
-
-    return 0;
+    delete board;
 }
